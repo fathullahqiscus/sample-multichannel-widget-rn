@@ -5,8 +5,45 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
+import { useMultichannelWidget } from '@qiscus-community/react-native-multichannel-widget';
+import { useCurrentUser } from '@qiscus-community/react-native-multichannel-widget';
+import { useMemo } from 'react';
 
 export default function HomeScreen() {
+  useEffect(() => {
+    const widget = useMultichannelWidget();
+    widget.setUser({
+      userId: 'sample_react_native_support_team',
+      displayName: 'React Native User Test',
+      avatarUrl: 'https://via.placeholder.com/200',
+      userProperties: {
+        extra_property_key: 'extra property value',
+      },
+    });
+  }, []);
+
+  const StartChatButton = () => {
+    const user = useCurrentUser();
+    const isLoggedIn = useMemo(() => user != null, [user]);
+
+    return (
+      <TouchableOpacity
+        style={[
+          styles.floatingButton,
+          { backgroundColor: isLoggedIn ? '#007AFF' : '#A9A9A9' },
+        ]}
+        onPress={() => isLoggedIn && alert('Start a new chat!')}
+        disabled={!isLoggedIn}
+      >
+        {isLoggedIn ? (
+          <Ionicons name="chatbubble-ellipses" size={24} color="white" />
+        ) : (
+          <Text style={styles.floatingButtonText}>...</Text>
+        )}
+      </TouchableOpacity>
+    );
+  };
   return (
     <>
       <ParallaxScrollView
@@ -38,13 +75,12 @@ export default function HomeScreen() {
           <ThemedText>
             Follow the documentation to integrate the chat SDK into your app.
           </ThemedText>
+          <StartChatButton />
         </ThemedView>
       </ParallaxScrollView>
-      <TouchableOpacity style={styles.floatingButton} onPress={() => alert('Start a new chat!')}>
-        <Ionicons name="chatbubble-ellipses" size={24} color="white" />
-      </TouchableOpacity>
     </>
   );
+
 }
 
 const styles = StyleSheet.create({
